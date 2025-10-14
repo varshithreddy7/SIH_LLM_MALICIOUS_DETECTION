@@ -1,8 +1,7 @@
 import "./global.css";
 
-import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import React, { Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -20,13 +19,18 @@ import Placeholder from "./pages/Placeholder";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ScrollTop } from "@/components/ScrollTop";
 
+const Toaster = React.lazy(() => import("@/components/ui/toaster").then(m => ({ default: m.Toaster })));
+const Sonner = React.lazy(() => import("@/components/ui/sonner").then(m => ({ default: m.Toaster })));
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
+      <Suspense fallback={null}>
+        <Toaster />
+        <Sonner />
+      </Suspense>
       <BrowserRouter>
         <div className="min-h-dvh bg-gradient-to-br from-background via-background to-background relative">
           <SiteHeader />
