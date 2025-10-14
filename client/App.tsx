@@ -8,6 +8,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Verify from "./pages/Verify";
+import Dashboard from "./pages/Dashboard";
+import Placeholder from "./pages/Placeholder";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 
 const queryClient = new QueryClient();
 
@@ -17,11 +21,23 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="min-h-dvh bg-gradient-to-br from-background via-background to-background relative">
+          <SiteHeader />
+          <main>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/verify" element={<Verify />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/threat-graph" element={<Placeholder title="Threat Intelligence Graph" />} />
+              <Route path="/audit-log" element={<Placeholder title="Blockchain Audit Log" />} />
+              <Route path="/reports" element={<Placeholder title="Reports & Insights" />} />
+              <Route path="/knowledge" element={<Placeholder title="Knowledge Hub / Blog" />} />
+              <Route path="/about" element={<Placeholder title="About & Governance" />} />
+              {/* Keep last */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
