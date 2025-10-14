@@ -15,7 +15,13 @@ export default function Dashboard(){
         const json = await res.json();
         if(!res.ok) throw new Error(json?.message || 'Failed to load');
         setData(json);
-      } catch (e:any){ setError(e.message); }
+      } catch (e:any){
+        setError(e.message);
+        setData({
+          weekly: Array.from({length:8}).map((_,i)=>({ week: `W${i+1}`, detections: Math.round(20+Math.random()*80) })),
+          aiVsHuman: [ { label: 'AI-generated', value: 61 }, { label: 'Human', value: 39 } ]
+        });
+      }
     })();
   }, []);
 
