@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Globe } from '@/components/effects/Globe';
+import React, { Suspense, useEffect, useState } from 'react';
+const Globe = React.lazy(() => import('@/components/effects/Globe').then(m => ({ default: m.Globe })));
 import { Shield, ScanEye, Network, ArrowRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 export default function Index(){
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
