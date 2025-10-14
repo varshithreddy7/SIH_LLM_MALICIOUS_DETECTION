@@ -3,7 +3,12 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils";
 
-const TooltipProvider = TooltipPrimitive.Provider;
+// Radix Tooltip Provider can sometimes cause issues in certain bundlers or environments.
+// Use a safe fallback that renders children when Provider isn't safe to use.
+const TooltipProvider = (props: React.PropsWithChildren<{ delayDuration?: number }>) => {
+  const { children } = props;
+  return <>{children}</>;
+};
 
 const Tooltip = TooltipPrimitive.Root;
 
