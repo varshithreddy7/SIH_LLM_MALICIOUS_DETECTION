@@ -1,0 +1,12 @@
+{
+  "name": "AI Defense Intelligence",
+  "short_name": "ADI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0F1C",
+  "theme_color": "#0A0F1C",
+  "description": "Detect and mitigate malicious LLM-generated disinformation with AI and cyber-grade analytics.",
+  "icons": [
+    { "src": "/placeholder.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
