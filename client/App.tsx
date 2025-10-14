@@ -2,6 +2,7 @@ import "./global.css";
 
 import { createRoot } from "react-dom/client";
 import React, { Suspense } from "react";
+import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
