@@ -35,12 +35,12 @@ export default function Index(){
             Detect fake or AI-generated news with Hugging Face models. Visualize threats, trace provenance, and preserve integrity with blockchain-style audit trails.
           </motion.p>
           <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:.15,duration:.7}} className="flex flex-wrap gap-3">
-            <Link to="/verify" className="group inline-flex items-center gap-2 rounded-xl px-5 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold hover:from-cyan-400 hover:to-purple-500 transition-colors">
+            <a href="/verify" className="group inline-flex items-center gap-2 rounded-xl px-5 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold hover:from-cyan-400 hover:to-purple-500 transition-colors">
               <ScanEye className="size-4"/> Verify Content <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5"/>
-            </Link>
-            <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-xl px-5 py-3 border border-white/10 bg-white/5 text-cyan-300 hover:bg-white/10 transition-colors">
+            </a>
+            <a href="/dashboard" className="inline-flex items-center gap-2 rounded-xl px-5 py-3 border border-white/10 bg-white/5 text-cyan-300 hover:bg-white/10 transition-colors">
               <Network className="size-4"/> Explore Dashboard
-            </Link>
+            </a>
             <button onClick={install} disabled={!deferredPrompt} className="inline-flex items-center gap-2 rounded-xl px-5 py-3 border border-white/10 bg-white/5 text-purple-300 hover:bg-white/10 transition-colors disabled:opacity-50">Install App</button>
           </motion.div>
         </div>
