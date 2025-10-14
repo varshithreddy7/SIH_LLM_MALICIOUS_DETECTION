@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+// Use plain anchors to avoid router context errors at runtime
 import { motion } from 'framer-motion';
 import React, { Suspense, useEffect, useState } from 'react';
 const Globe = React.lazy(() => import('@/components/effects/Globe').then(m => ({ default: m.Globe })));
