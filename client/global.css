@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;600;700&family=Exo+2:wght@400;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -12,89 +12,85 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light mode - sleek cyber light */
+    --background: 220 30% 98%; /* near-white with blue tint */
+    --foreground: 222 69% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 220 30% 98%;
+    --card-foreground: 222 69% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 220 30% 98%;
+    --popover-foreground: 222 69% 8%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 180 100% 50%; /* #00FFFF cyan */
+    --primary-foreground: 230 80% 6%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 221 40% 35%; /* #1E2B4A base */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 20% 92%;
+    --muted-foreground: 221 12% 30%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 270 100% 50%; /* #7A00FF purple */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 24% 85%;
+    --input: 220 24% 85%;
+    --ring: 180 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 220 30% 98%;
+    --sidebar-foreground: 222 69% 8%;
+    --sidebar-primary: 180 100% 50%;
+    --sidebar-primary-foreground: 230 80% 6%;
+    --sidebar-accent: 270 100% 50%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 24% 85%;
+    --sidebar-ring: 180 100% 50%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark neon cyber */
+    --background: 220 45% 6%; /* #0A0F1C */
+    --foreground: 180 14% 94%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 222 40% 8%;
+    --card-foreground: 180 14% 94%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 222 40% 8%;
+    --popover-foreground: 180 14% 94%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 180 100% 50%; /* cyan glow */
+    --primary-foreground: 220 60% 6%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 221 40% 29%; /* #1E2B4A */
+    --secondary-foreground: 180 14% 94%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 30% 14%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 270 100% 50%; /* neon purple */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 40.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 220 30% 18%;
+    --input: 220 30% 18%;
+    --ring: 180 100% 50%;
+
+    --sidebar-background: 220 45% 6%;
+    --sidebar-foreground: 180 14% 94%;
+    --sidebar-primary: 180 100% 50%;
+    --sidebar-primary-foreground: 220 60% 6%;
+    --sidebar-accent: 270 100% 50%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 30% 18%;
+    --sidebar-ring: 180 100% 50%;
   }
 }
 
@@ -104,7 +100,23 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: Poppins, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  }
+
+  h1,h2,h3,h4,h5,h6,.font-heading{ font-family: Orbitron, Exo\ 2, Poppins, ui-sans-serif, system-ui; letter-spacing: 0.02em; }
+
+  /* Glassmorphism & neon helpers */
+  .glass{ @apply bg-white/5 dark:bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl; }
+  .neon-text{ text-shadow: 0 0 10px hsla(180,100%,50%,0.6), 0 0 20px hsla(270,100%,50%,0.35); }
+  .neon-border{ box-shadow: 0 0 0 1px hsl(var(--border)), 0 0 20px hsla(180,100%,50%,0.2), inset 0 0 20px hsla(270,100%,50%,0.12); }
+  .glow-cyan{ box-shadow: 0 0 30px 6px hsla(180,100%,50%,0.25); }
+  .glow-purple{ box-shadow: 0 0 30px 6px hsla(270,100%,50%,0.25); }
+
+  .grid-noise{
+    position: absolute; inset: 0; pointer-events: none; opacity: .12; mix-blend-mode: screen;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.35) 1px, transparent 0);
+    background-size: 24px 24px;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
