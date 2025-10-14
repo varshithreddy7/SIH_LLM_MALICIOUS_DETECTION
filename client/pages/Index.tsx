@@ -1,62 +1,59 @@
-import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Globe } from '@/components/effects/Globe';
+import { Shield, ScanEye, Network, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
+export default function Index(){
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   useEffect(() => {
-    fetchDemo();
+    const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
-    try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
-    }
-  };
+  const install = async () => { if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; setDeferredPrompt(null);} };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
-      </div>
+    <div className="relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(0,255,255,0.12),transparent_60%)]" />
+      <div className="grid-noise" />
+      <Globe />
+      <section className="container relative flex min-h-[80vh] items-center">
+        <div className="max-w-3xl space-y-6">
+          <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{duration:.6}}>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-cyan-300">
+              <Shield className="size-3"/> Cyber AI Defense
+            </div>
+          </motion.div>
+          <motion.h1 initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:.05,duration:.7}} className="font-heading neon-text text-4xl md:text-6xl leading-tight text-white">
+            Safeguarding Truth in the Age of AI-Driven Misinformation.
+          </motion.h1>
+          <motion.p initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:.1,duration:.7}} className="text-lg text-foreground/75 max-w-2xl">
+            Detect fake or AI-generated news with Hugging Face models. Visualize threats, trace provenance, and preserve integrity with blockchain-style audit trails.
+          </motion.p>
+          <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:.15,duration:.7}} className="flex flex-wrap gap-3">
+            <Link to="/verify" className="group inline-flex items-center gap-2 rounded-xl px-5 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold hover:from-cyan-400 hover:to-purple-500 transition-colors">
+              <ScanEye className="size-4"/> Verify Content <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5"/>
+            </Link>
+            <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-xl px-5 py-3 border border-white/10 bg-white/5 text-cyan-300 hover:bg-white/10 transition-colors">
+              <Network className="size-4"/> Explore Dashboard
+            </Link>
+            <button onClick={install} disabled={!deferredPrompt} className="inline-flex items-center gap-2 rounded-xl px-5 py-3 border border-white/10 bg-white/5 text-purple-300 hover:bg-white/10 transition-colors disabled:opacity-50">Install App</button>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="relative pb-20">
+        <div className="container grid gap-6 md:grid-cols-3">
+          {[{label:'Articles Scanned',value:'20K+'},{label:'Detection Accuracy',value:'92%'},{label:'Real-time Models',value:'2+'}].map((m,i)=> (
+            <motion.div key={m.label} initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:i*0.05}} className="glass neon-border rounded-2xl p-6">
+              <div className="text-3xl font-heading text-cyan-300">{m.value}</div>
+              <div className="text-foreground/70">{m.label}</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
