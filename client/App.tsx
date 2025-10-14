@@ -10,8 +10,15 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Verify from "./pages/Verify";
 import Dashboard from "./pages/Dashboard";
+import ThreatGraph from "./pages/ThreatGraph";
+import AuditLog from "./pages/AuditLog";
+import Reports from "./pages/Reports";
+import Knowledge from "./pages/Knowledge";
+import About from "./pages/About";
+import { Login, Register } from "./pages/auth";
 import Placeholder from "./pages/Placeholder";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ScrollTop } from "@/components/ScrollTop";
 
 const queryClient = new QueryClient();
 
@@ -28,18 +35,19 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/verify" element={<Verify />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/threat-graph" element={<Placeholder title="Threat Intelligence Graph" />} />
-              <Route path="/audit-log" element={<Placeholder title="Blockchain Audit Log" />} />
-              <Route path="/reports" element={<Placeholder title="Reports & Insights" />} />
-              <Route path="/knowledge" element={<Placeholder title="Knowledge Hub / Blog" />} />
-              <Route path="/about" element={<Placeholder title="About & Governance" />} />
+              <Route path="/threat-graph" element={<ThreatGraph />} />
+              <Route path="/audit-log" element={<AuditLog />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/knowledge" element={<Knowledge />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/auth/login" element={<Login />} />
+              <Route path="/auth/register" element={<Register />} />
               {/* Keep last */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
-          <a href="/about" className="fixed bottom-6 right-6 rounded-full px-4 py-3 border border-white/10 bg-white/5 text-cyan-200 hover:bg-white/10 transition-colors shadow-lg">
-            Contact / Chat
-          </a>
+          <ScrollTop />
+          <a href="/about" className="fixed bottom-6 right-6 rounded-full px-4 py-3 border border-white/10 bg-white/5 text-cyan-200 hover:bg-white/10 transition-colors shadow-lg">Contact / Chat</a>
         </div>
       </BrowserRouter>
     </TooltipProvider>

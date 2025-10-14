@@ -40,6 +40,7 @@ export function SiteHeader() {
           <Link to="/dashboard" className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md border border-white/10 bg-white/5 text-purple-300 hover:bg-white/10 transition-colors">
             <Network className="size-4" /> Dashboard
           </Link>
+          <Link to="/auth/login" className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md border border-white/10 bg-white/5 text-foreground/80 hover:bg-white/10 transition-colors">Sign In</Link>
           <ThemeToggle />
         </div>
       </div>
