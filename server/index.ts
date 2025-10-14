@@ -28,7 +28,6 @@ export function createServer() {
         return res.status(501).json({ message: "ML service not configured. Set ML_API_URL to your FastAPI/Flask endpoint." });
       }
       const payload = req.body as VerifyRequest;
-      const r = await fetch(new URL("/verify", mlUrl));
       const mlRes = await fetch(new URL("/verify", mlUrl).toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
