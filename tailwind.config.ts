@@ -13,6 +13,11 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Poppins", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Inter", "Arial", "Apple Color Emoji", "Segoe UI Emoji"],
+        heading: ["Orbitron", "Exo 2", "Poppins", "ui-sans-serif", "system-ui"],
+        mono: ["Exo 2", "ui-monospace", "SFMono-Regular"]
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +62,8 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "cyber-cyan": "#00FFFF",
+        "cyber-purple": "#7A00FF",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,25 +72,28 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        glow: {
+          from: { boxShadow: "0 0 0 0 hsla(180,100%,50%,0.3)" },
+          to: { boxShadow: "0 0 30px 6px hsla(180,100%,50%,0.3)" },
+        },
+        float: {
+          "0%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-8px)" },
+          "100%": { transform: "translateY(0px)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        glow: "glow 2.4s ease-in-out infinite alternate",
+        float: "float 6s ease-in-out infinite",
       },
     },
   },
