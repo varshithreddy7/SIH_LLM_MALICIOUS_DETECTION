@@ -1,46 +1,98 @@
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
-import * as THREE from 'three';
-import { Suspense, useMemo, useRef } from 'react';
+import React from 'react';
 
-function RotatingPoints() {
-  const ref = useRef<THREE.Points>(null!);
-  const sphere = useMemo(() => new Float32Array(Array.from({ length: 2000 }, () => 0).flatMap(() => {
-    const u = Math.random();
-    const v = Math.random();
-    const theta = 2 * Math.PI * u;
-    const phi = Math.acos(2 * v - 1);
-    const r = 1.4;
-    const x = r * Math.sin(phi) * Math.cos(theta);
-    const y = r * Math.sin(phi) * Math.sin(theta);
-    const z = r * Math.cos(phi);
-    return [x, y, z];
-  })), []);
+// Lightweight, hook-free canvas globe to avoid React hook conflicts
+export class Globe extends React.Component {
+  canvasRef: React.RefObject<HTMLCanvasElement> = React.createRef();
+  raf = 0;
+  points: Array<{ x: number; y: number; z: number }>=[];
+  angle = 0;
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (ref.current) {
-      ref.current.rotation.y = t * 0.12;
-      ref.current.rotation.x = Math.sin(t * 0.2) * 0.1;
+  constructor(props:any){
+    super(props);
+    // generate sphere points
+    const total = 1200;
+    for(let i=0;i<total;i++){
+      const u = Math.random();
+      const v = Math.random();
+      const theta = 2 * Math.PI * u;
+      const phi = Math.acos(2 * v - 1);
+      const r = 1;
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta);
+      const z = r * Math.cos(phi);
+      this.points.push({x,y,z});
     }
-  });
+  }
 
-  return (
-    <Points ref={ref} positions={sphere} stride={3} frustumCulled>
-      <PointMaterial transparent color="#00FFFF" size={0.02} sizeAttenuation depthWrite={false} />
-    </Points>
-  );
+  componentDidMount(){
+    this.resize();
+    window.addEventListener('resize', this.resize);
+    this.raf = requestAnimationFrame(this.tick);
+  }
+
+  componentWillUnmount(){
+    window.removeEventListener('resize', this.resize);
+    cancelAnimationFrame(this.raf);
+  }
+
+  resize = ()=>{
+    const canvas = this.canvasRef.current;
+    if(!canvas) return;
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+  }
+
+  tick = (t:number)=>{
+    const canvas = this.canvasRef.current;
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if(!ctx) return;
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    // center
+    const cx = w/2;
+    const cy = h/2;
+    // rotate
+    this.angle += 0.0025;
+    const sinA = Math.sin(this.angle);
+    const cosA = Math.cos(this.angle);
+    // draw points
+    for(const p of this.points){
+      // rotate around Y axis
+      const x = p.x * cosA + p.z * sinA;
+      const z = -p.x * sinA + p.z * cosA;
+      const scale = 1.6;
+      const px = cx + x * (Math.min(w,h)/3) * scale;
+      const py = cy + p.y * (Math.min(w,h)/3) * scale;
+      const depth = (z + 1) / 2; // 0..1
+      const alpha = 0.2 + depth * 0.9;
+      const size = 0.6 + depth * 1.6;
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(0,255,255,${alpha})`;
+      ctx.arc(px, py, size, 0, Math.PI*2);
+      ctx.fill();
+    }
+    // subtle glow overlay
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = 'rgba(10,255,255,0.012)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.min(w,h)/2.4, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+
+    this.raf = requestAnimationFrame(this.tick);
+  }
+
+  render(){
+    return (
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <canvas ref={this.canvasRef} style={{width:'100%', height:'100%'}} />
+      </div>
+    );
+  }
 }
 
-export function Globe() {
-  return (
-    <div className="absolute inset-0 -z-10">
-      <Canvas camera={{ position: [0, 0, 4] }}>
-        <Suspense fallback={null}>
-          <ambientLight intensity={0.4} />
-          <RotatingPoints />
-        </Suspense>
-      </Canvas>
-    </div>
-  );
-}
+export default Globe;
