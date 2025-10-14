@@ -18,7 +18,9 @@ export default function Index(){
     <div className="relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(0,255,255,0.12),transparent_60%)]" />
       <div className="grid-noise" />
-      <Globe />
+      <Suspense fallback={null}>
+        <Globe />
+      </Suspense>
       <section className="container relative flex min-h-[80vh] items-center">
         <div className="max-w-3xl space-y-6">
           <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{duration:.6}}>
