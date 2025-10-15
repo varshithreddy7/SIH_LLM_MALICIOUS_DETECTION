@@ -1,32 +1,36 @@
-const CACHE = 'adi-cache-v2';
+const CACHE = "adi-cache-v2";
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/placeholder.svg',
-  '/manifest.webmanifest'
+  "/",
+  "/index.html",
+  "/placeholder.svg",
+  "/manifest.webmanifest",
 ];
 
-self.addEventListener('install', (e) => {
+self.addEventListener("install", (e) => {
   e.waitUntil(
     caches
       .open(CACHE)
       .then((c) => c.addAll(ASSETS))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()),
   );
 });
 
-self.addEventListener('activate', (e) => {
+self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)),
+        ),
+      )
+      .then(() => self.clients.claim()),
   );
 });
 
-self.addEventListener('fetch', (e) => {
+self.addEventListener("fetch", (e) => {
   const req = e.request;
-  if (req.method !== 'GET') return;
+  if (req.method !== "GET") return;
 
   const url = new URL(req.url);
   // Only cache same-origin known ASSETS; avoid caching Vite dev modules and node_modules
@@ -43,6 +47,6 @@ self.addEventListener('fetch', (e) => {
           return netRes;
         })
         .catch(() => cached);
-    })
+    }),
   );
 });

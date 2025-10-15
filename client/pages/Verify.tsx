@@ -100,13 +100,16 @@ const Verify = () => {
         const text = await response.text();
         let parsed: (VerifyResponse & { message?: string }) | null = null;
         try {
-          parsed = text ? (JSON.parse(text) as VerifyResponse & { message?: string }) : null;
+          parsed = text
+            ? (JSON.parse(text) as VerifyResponse & { message?: string })
+            : null;
         } catch {
           parsed = null;
         }
 
         if (!response.ok) {
-          const msg = (parsed && parsed.message) || text || "Verification failed";
+          const msg =
+            (parsed && parsed.message) || text || "Verification failed";
           throw new Error(msg);
         }
 
