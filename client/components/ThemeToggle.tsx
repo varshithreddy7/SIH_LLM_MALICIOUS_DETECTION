@@ -2,7 +2,7 @@ import React from "react";
 import React from "react";
 import { Moon, Sun } from "lucide-react";
 
-export class ThemeSwitch extends React.Component<{}, { dark: boolean }> {
+class ThemeSwitch extends React.Component<{}, { dark: boolean }> {
   constructor(props: {}) {
     super(props);
     const isDark = typeof document !== "undefined" ? document.documentElement.classList.contains("dark") : true;
