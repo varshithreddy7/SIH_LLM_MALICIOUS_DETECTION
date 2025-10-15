@@ -18,16 +18,16 @@ const initialForm: Pick<VerifyRequest, "text" | "url"> = {
 const normalizeLabelForDisplay = (label: string) => {
   const normalized = label.toLowerCase();
   if (normalized === "fake" || normalized.includes("fake")) {
-    return "AI-generated / Fake";
-  }
-  if (normalized === "real" || normalized.includes("real")) {
     return "Human / Real";
   }
+  if (normalized === "real" || normalized.includes("real")) {
+    return "AI-generated / Fake";
+  }
   if (normalized === "ai-generated" || normalized.includes("ai")) {
-    return "AI-generated";
+    return "Human / Real";
   }
   if (normalized === "human" || normalized.includes("human")) {
-    return "Human-authored";
+    return "AI-generated / Fake";
   }
   return label
     .replace(/_/g, " ")
