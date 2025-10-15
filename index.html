@@ -23,13 +23,16 @@
   <body>
     <div id="root"></div>
 
-    <script type="module" src="/client/App.tsx"></script>
     <script>
+      // Ensure no stale service workers/cache cause duplicate module copies in dev
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
-        });
+        navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister())).catch(() => {});
+        if (window.caches && caches.keys) {
+          caches.keys().then((keys) => keys.forEach((k) => /^adi-cache-/.test(k) && caches.delete(k))).catch(() => {});
+        }
       }
     </script>
+    <script type="module" src="/client/App.tsx"></script>
+    <!-- Service worker registration disabled in dev to avoid caching dev modules. Enable for production only. -->
   </body>
 </html>
