@@ -20,21 +20,78 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
-  // Content verification -> Python ML layer
+  // Content verification -> Hugging Face Inference API
   app.post("/api/verify", async (req, res) => {
     try {
-      const mlUrl = process.env.ML_API_URL;
-      if (!mlUrl) {
-        return res.status(501).json({ message: "ML service not configured. Set ML_API_URL to your FastAPI/Flask endpoint." });
+      const token = process.env.HF_TOKEN;
+      if (!token) {
+        return res.status(501).json({ message: "HF_TOKEN not configured. Set HF_TOKEN in your environment." });
       }
       const payload = req.body as VerifyRequest;
-      const mlRes = await fetch(new URL("/verify", mlUrl).toString(), {
+
+      let input = (payload.text || "").trim();
+      if (!input && payload.url) {
+        try {
+          const page = await fetch(payload.url);
+          const html = await page.text();
+          input = html
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 4000);
+        } catch {
+          // ignore URL fetch errors and fall back to require text
+        }
+      }
+
+      if (!input) {
+        return res.status(400).json({ message: "Provide text or url" });
+      }
+
+      const hfRes = await fetch("https://api-inference.huggingface.co/models/Pulk17/Fake-News-Detection", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputs: input }),
       });
-      const data = (await mlRes.json()) as VerifyResponse;
-      return res.status(mlRes.status).json(data);
+
+      const json = await hfRes.json();
+      if (!hfRes.ok) {
+        const msg = (json && (json.error || json.message)) || "Hugging Face request failed";
+        return res.status(hfRes.status).json({ message: msg });
+      }
+
+      let topLabel = "unknown";
+      let topScore = 0;
+      const probabilities: Record<string, number> = {};
+
+      const arr = Array.isArray(json) ? json : [];
+      const first = arr[0];
+      const items = Array.isArray(first) ? first : arr;
+      if (Array.isArray(items)) {
+        for (const it of items) {
+          if (it && typeof it === "object") {
+            const label = (it.label || it.class || it.category || "").toString();
+            const score = typeof it.score === "number" ? it.score : typeof it.confidence === "number" ? it.confidence : 0;
+            if (label) {
+              probabilities[label] = score;
+              if (score > topScore) { topLabel = label; topScore = score; }
+            }
+          }
+        }
+      }
+
+      const resp: VerifyResponse = {
+        label: topLabel.toLowerCase().includes("fake") ? "fake" : topLabel,
+        confidence: topScore || 0,
+        probabilities: Object.keys(probabilities).length ? probabilities : undefined,
+      };
+
+      return res.json(resp);
     } catch (e: any) {
       return res.status(500).json({ message: e?.message || "Verification failed" });
     }
