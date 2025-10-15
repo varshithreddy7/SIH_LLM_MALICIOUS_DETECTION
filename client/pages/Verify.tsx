@@ -15,6 +15,26 @@ const initialForm: Pick<VerifyRequest, "text" | "url"> = {
   url: "",
 };
 
+const normalizeLabelForDisplay = (label: string) => {
+  const normalized = label.toLowerCase();
+  if (normalized === "fake" || normalized.includes("fake")) {
+    return "AI-generated / Fake";
+  }
+  if (normalized === "real" || normalized.includes("real")) {
+    return "Human / Real";
+  }
+  if (normalized === "ai-generated" || normalized.includes("ai")) {
+    return "AI-generated";
+  }
+  if (normalized === "human" || normalized.includes("human")) {
+    return "Human-authored";
+  }
+  return label.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const clampPercent = (value: number) =>
+  Math.round(Math.max(0, Math.min(1, value || 0)) * 100);
+
 const Verify = () => {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
