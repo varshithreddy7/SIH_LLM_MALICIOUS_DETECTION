@@ -10,12 +10,10 @@ export default async function handler(req: any, res: any) {
   try {
     const token = process.env.HF_TOKEN;
     if (!token) {
-      res
-        .status(501)
-        .json({
-          message:
-            "HF_TOKEN not configured. Set HF_TOKEN in your Vercel project settings.",
-        });
+      res.status(501).json({
+        message:
+          "HF_TOKEN not configured. Set HF_TOKEN in your Vercel project settings.",
+      });
       return;
     }
 
@@ -90,7 +88,12 @@ export default async function handler(req: any, res: any) {
     if (Array.isArray(items)) {
       for (const it of items) {
         if (it && typeof it === "object") {
-          const rawLabel = (it.label || it.class || it.category || "").toString();
+          const rawLabel = (
+            it.label ||
+            it.class ||
+            it.category ||
+            ""
+          ).toString();
           const label = normalizeLabel(rawLabel);
           const score =
             typeof it.score === "number"
@@ -100,9 +103,8 @@ export default async function handler(req: any, res: any) {
                 : 0;
           if (label) {
             const current = probabilities[label];
-            probabilities[label] = current !== undefined
-              ? Math.max(current, score)
-              : score;
+            probabilities[label] =
+              current !== undefined ? Math.max(current, score) : score;
             if (score > topScore) {
               topLabel = label;
               topScore = score;

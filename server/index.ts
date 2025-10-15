@@ -30,12 +30,9 @@ export function createServer() {
     try {
       const token = process.env.HF_TOKEN;
       if (!token) {
-        return res
-          .status(501)
-          .json({
-            message:
-              "HF_TOKEN not configured. Set HF_TOKEN in your environment.",
-          });
+        return res.status(501).json({
+          message: "HF_TOKEN not configured. Set HF_TOKEN in your environment.",
+        });
       }
       const payload = req.body as VerifyRequest;
 
@@ -122,9 +119,8 @@ export function createServer() {
                   : 0;
             if (label) {
               const current = probabilities[label];
-              probabilities[label] = current !== undefined
-                ? Math.max(current, score)
-                : score;
+              probabilities[label] =
+                current !== undefined ? Math.max(current, score) : score;
               if (score > topScore) {
                 topLabel = label;
                 topScore = score;
@@ -153,12 +149,10 @@ export function createServer() {
   // Analytics & reports (MongoDB-backed expected)
   app.get("/api/analytics", async (_req, res) => {
     if (!process.env.MONGODB_URI) {
-      return res
-        .status(501)
-        .json({
-          message:
-            "Analytics not available. Connect MongoDB and implement aggregations.",
-        });
+      return res.status(501).json({
+        message:
+          "Analytics not available. Connect MongoDB and implement aggregations.",
+      });
     }
     try {
       // Intentionally not implemented here to avoid bundling DB drivers.
@@ -174,12 +168,10 @@ export function createServer() {
 
   app.get("/api/reports", async (_req, res) => {
     if (!process.env.MONGODB_URI) {
-      return res
-        .status(501)
-        .json({
-          message:
-            "Reports not available. Connect MongoDB and implement queries.",
-        });
+      return res.status(501).json({
+        message:
+          "Reports not available. Connect MongoDB and implement queries.",
+      });
     }
     try {
       const resp: ReportsResponse = { recent: [] };

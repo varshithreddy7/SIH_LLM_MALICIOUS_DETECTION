@@ -29,7 +29,9 @@ const normalizeLabelForDisplay = (label: string) => {
   if (normalized === "human" || normalized.includes("human")) {
     return "Human-authored";
   }
-  return label.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  return label
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 const clampPercent = (value: number) =>
@@ -45,7 +47,8 @@ const Verify = () => {
     if (!result) return "text-green-400";
     if (result.label === "fake") return "text-red-400";
     if (result.label === "ai-generated") return "text-purple-400";
-    if (result.label === "real" || result.label === "human") return "text-green-400";
+    if (result.label === "real" || result.label === "human")
+      return "text-green-400";
     return "text-cyan-300";
   }, [result]);
 
@@ -55,7 +58,8 @@ const Verify = () => {
   }, [result]);
 
   const probabilityEntries = useMemo(() => {
-    if (!result?.probabilities) return [] as Array<{ key: string; label: string; value: number }>;
+    if (!result?.probabilities)
+      return [] as Array<{ key: string; label: string; value: number }>;
     return Object.entries(result.probabilities)
       .map(([key, value]) => ({
         key,
@@ -93,7 +97,9 @@ const Verify = () => {
           body: JSON.stringify(payload),
         });
 
-        const data = (await response.json()) as VerifyResponse & { message?: string };
+        const data = (await response.json()) as VerifyResponse & {
+          message?: string;
+        };
 
         if (!response.ok) {
           throw new Error(data?.message || "Verification failed");
@@ -148,10 +154,7 @@ const Verify = () => {
             />
           </div>
           <button
-            disabled={
-              loading ||
-              (!form.text?.trim() && !form.url?.trim())
-            }
+            disabled={loading || (!form.text?.trim() && !form.url?.trim())}
             className="w-full rounded-md px-4 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold hover:from-cyan-400 hover:to-purple-500 transition-colors disabled:opacity-60"
           >
             {loading ? "Analyzing…" : "Verify Now"}
@@ -200,18 +203,26 @@ const Verify = () => {
                 exit={{ opacity: 0, y: -10 }}
                 className="glass neon-border rounded-2xl p-6 space-y-4"
               >
-                <div className={`font-heading text-2xl ${badgeColor} flex items-center gap-2`}>
-                  <ShieldCheck /> {friendlyResultLabel || result.label.toUpperCase()}
+                <div
+                  className={`font-heading text-2xl ${badgeColor} flex items-center gap-2`}
+                >
+                  <ShieldCheck />{" "}
+                  {friendlyResultLabel || result.label.toUpperCase()}
                 </div>
                 <div>
                   <div className="text-sm text-foreground/70">Confidence</div>
-                  <Progress value={clampPercent(result.confidence)} className="h-3" />
+                  <Progress
+                    value={clampPercent(result.confidence)}
+                    className="h-3"
+                  />
                 </div>
                 {probabilityEntries.length > 0 && (
                   <div className="space-y-2">
                     {probabilityEntries.map(({ key, label, value }) => (
                       <div key={key}>
-                        <div className="text-xs text-foreground/60">{label}</div>
+                        <div className="text-xs text-foreground/60">
+                          {label}
+                        </div>
                         <Progress value={clampPercent(value)} className="h-2" />
                       </div>
                     ))}
@@ -219,7 +230,8 @@ const Verify = () => {
                 )}
                 {result.reason && (
                   <p className="text-sm text-foreground/80">
-                    <span className="text-foreground/60">Reason:</span> {result.reason}
+                    <span className="text-foreground/60">Reason:</span>{" "}
+                    {result.reason}
                   </p>
                 )}
               </motion.div>
