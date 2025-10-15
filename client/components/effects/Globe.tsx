@@ -1,5 +1,7 @@
 import React from 'react';
 
+import React from 'react';
+
 // Lightweight, hook-free canvas globe to avoid React hook conflicts
 export class Globe extends React.Component {
   canvasRef: React.RefObject<HTMLCanvasElement> = React.createRef();
