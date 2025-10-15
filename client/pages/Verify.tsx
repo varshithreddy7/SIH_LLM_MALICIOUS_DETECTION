@@ -97,15 +97,27 @@ const Verify = () => {
           body: JSON.stringify(payload),
         });
 
-        const data = (await response.json()) as VerifyResponse & {
-          message?: string;
-        };
-
-        if (!response.ok) {
-          throw new Error(data?.message || "Verification failed");
+        const text = await response.text();
+        let parsed: (VerifyResponse & { message?: string }) | null = null;
+        try {
+          parsed = text
+            ? (JSON.parse(text) as VerifyResponse & { message?: string })
+            : null;
+        } catch {
+          parsed = null;
         }
 
-        setResult(data);
+        if (!response.ok) {
+          const msg =
+            (parsed && parsed.message) || text || "Verification failed";
+          throw new Error(msg);
+        }
+
+        if (!parsed) {
+          throw new Error("Unexpected empty response");
+        }
+
+        setResult(parsed);
       } catch (submissionError) {
         const message =
           submissionError instanceof Error
