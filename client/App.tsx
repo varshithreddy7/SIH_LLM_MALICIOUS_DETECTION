@@ -53,20 +53,27 @@ const App = () => {
     const onLink = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      const anchor = (target.closest && target.closest('a')) as HTMLAnchorElement | null;
+      const anchor = (target.closest &&
+        target.closest("a")) as HTMLAnchorElement | null;
       if (!anchor) return;
-      const href = anchor.getAttribute('href');
-      if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('#')) return;
+      const href = anchor.getAttribute("href");
+      if (
+        !href ||
+        href.startsWith("http") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("#")
+      )
+        return;
       e.preventDefault();
-      window.history.pushState({}, '', href);
+      window.history.pushState({}, "", href);
       setPath(window.location.pathname);
     };
 
-    window.addEventListener('popstate', onPop);
-    document.addEventListener('click', onLink);
+    window.addEventListener("popstate", onPop);
+    document.addEventListener("click", onLink);
     return () => {
-      window.removeEventListener('popstate', onPop);
-      document.removeEventListener('click', onLink);
+      window.removeEventListener("popstate", onPop);
+      document.removeEventListener("click", onLink);
     };
   }, []);
 
@@ -78,7 +85,12 @@ const App = () => {
           <RouterView path={path} />
         </main>
         <ScrollTop />
-        <a href="/about" className="fixed bottom-6 right-6 rounded-full px-4 py-3 border border-white/10 bg-white/5 text-cyan-200 hover:bg-white/10 transition-colors shadow-lg">Contact / Chat</a>
+        <a
+          href="/about"
+          className="fixed bottom-6 right-6 rounded-full px-4 py-3 border border-white/10 bg-white/5 text-cyan-200 hover:bg-white/10 transition-colors shadow-lg"
+        >
+          Contact / Chat
+        </a>
       </div>
     </QueryClientProvider>
   );

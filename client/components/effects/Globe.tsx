@@ -1,6 +1,4 @@
-import React from 'react';
-
-
+import React from "react";
 
 // Lightweight, hook-free canvas globe to avoid React hook conflicts
 class Globe extends React.Component {
@@ -28,12 +26,12 @@ class Globe extends React.Component {
 
   componentDidMount() {
     this.resize();
-    window.addEventListener('resize', this.resize);
+    window.addEventListener("resize", this.resize);
     this.raf = requestAnimationFrame(this.tick);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.resize);
+    window.removeEventListener("resize", this.resize);
     cancelAnimationFrame(this.raf);
   }
 
@@ -49,7 +47,7 @@ class Globe extends React.Component {
   tick = (t: number) => {
     const canvas = this.canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const w = canvas.width;
     const h = canvas.height;
@@ -73,19 +71,22 @@ class Globe extends React.Component {
       ctx.arc(px, py, size, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.fillStyle = 'rgba(10,255,255,0.012)';
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillStyle = "rgba(10,255,255,0.012)";
     ctx.beginPath();
     ctx.arc(cx, cy, Math.min(w, h) / 2.4, 0, Math.PI * 2);
     ctx.fill();
-    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalCompositeOperation = "source-over";
     this.raf = requestAnimationFrame(this.tick);
   };
 
   render() {
     return (
       <div className="absolute inset-0 -z-10 pointer-events-none">
-        <canvas ref={this.canvasRef} style={{ width: '100%', height: '100%' }} />
+        <canvas
+          ref={this.canvasRef}
+          style={{ width: "100%", height: "100%" }}
+        />
       </div>
     );
   }

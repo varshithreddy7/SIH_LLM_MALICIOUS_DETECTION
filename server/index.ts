@@ -2,7 +2,12 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import type { VerifyRequest, VerifyResponse, AnalyticsResponse, ReportsResponse } from "@shared/api";
+import type {
+  VerifyRequest,
+  VerifyResponse,
+  AnalyticsResponse,
+  ReportsResponse,
+} from "@shared/api";
 
 export function createServer() {
   const app = express();
@@ -25,7 +30,12 @@ export function createServer() {
     try {
       const token = process.env.HF_TOKEN;
       if (!token) {
-        return res.status(501).json({ message: "HF_TOKEN not configured. Set HF_TOKEN in your environment." });
+        return res
+          .status(501)
+          .json({
+            message:
+              "HF_TOKEN not configured. Set HF_TOKEN in your environment.",
+          });
       }
       const payload = req.body as VerifyRequest;
 
@@ -50,18 +60,23 @@ export function createServer() {
         return res.status(400).json({ message: "Provide text or url" });
       }
 
-      const hfRes = await fetch("https://api-inference.huggingface.co/models/Pulk17/Fake-News-Detection", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const hfRes = await fetch(
+        "https://api-inference.huggingface.co/models/Pulk17/Fake-News-Detection",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ inputs: input }),
         },
-        body: JSON.stringify({ inputs: input }),
-      });
+      );
 
       const json = await hfRes.json();
       if (!hfRes.ok) {
-        const msg = (json && (json.error || json.message)) || "Hugging Face request failed";
+        const msg =
+          (json && (json.error || json.message)) ||
+          "Hugging Face request failed";
         return res.status(hfRes.status).json({ message: msg });
       }
 
@@ -75,11 +90,24 @@ export function createServer() {
       if (Array.isArray(items)) {
         for (const it of items) {
           if (it && typeof it === "object") {
-            const label = (it.label || it.class || it.category || "").toString();
-            const score = typeof it.score === "number" ? it.score : typeof it.confidence === "number" ? it.confidence : 0;
+            const label = (
+              it.label ||
+              it.class ||
+              it.category ||
+              ""
+            ).toString();
+            const score =
+              typeof it.score === "number"
+                ? it.score
+                : typeof it.confidence === "number"
+                  ? it.confidence
+                  : 0;
             if (label) {
               probabilities[label] = score;
-              if (score > topScore) { topLabel = label; topScore = score; }
+              if (score > topScore) {
+                topLabel = label;
+                topScore = score;
+              }
             }
           }
         }
@@ -88,19 +116,28 @@ export function createServer() {
       const resp: VerifyResponse = {
         label: topLabel.toLowerCase().includes("fake") ? "fake" : topLabel,
         confidence: topScore || 0,
-        probabilities: Object.keys(probabilities).length ? probabilities : undefined,
+        probabilities: Object.keys(probabilities).length
+          ? probabilities
+          : undefined,
       };
 
       return res.json(resp);
     } catch (e: any) {
-      return res.status(500).json({ message: e?.message || "Verification failed" });
+      return res
+        .status(500)
+        .json({ message: e?.message || "Verification failed" });
     }
   });
 
   // Analytics & reports (MongoDB-backed expected)
   app.get("/api/analytics", async (_req, res) => {
     if (!process.env.MONGODB_URI) {
-      return res.status(501).json({ message: "Analytics not available. Connect MongoDB and implement aggregations." });
+      return res
+        .status(501)
+        .json({
+          message:
+            "Analytics not available. Connect MongoDB and implement aggregations.",
+        });
     }
     try {
       // Intentionally not implemented here to avoid bundling DB drivers.
@@ -108,19 +145,28 @@ export function createServer() {
       const resp: AnalyticsResponse = { weekly: [], aiVsHuman: [] };
       return res.json(resp);
     } catch (e: any) {
-      return res.status(500).json({ message: e?.message || "Failed to load analytics" });
+      return res
+        .status(500)
+        .json({ message: e?.message || "Failed to load analytics" });
     }
   });
 
   app.get("/api/reports", async (_req, res) => {
     if (!process.env.MONGODB_URI) {
-      return res.status(501).json({ message: "Reports not available. Connect MongoDB and implement queries." });
+      return res
+        .status(501)
+        .json({
+          message:
+            "Reports not available. Connect MongoDB and implement queries.",
+        });
     }
     try {
       const resp: ReportsResponse = { recent: [] };
       return res.json(resp);
     } catch (e: any) {
-      return res.status(500).json({ message: e?.message || "Failed to load reports" });
+      return res
+        .status(500)
+        .json({ message: e?.message || "Failed to load reports" });
     }
   });
 
