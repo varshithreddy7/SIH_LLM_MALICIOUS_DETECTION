@@ -36,4 +36,5 @@ class ThemeSwitch extends React.Component<{}, { dark: boolean }> {
   }
 }
 
+export const ThemeToggle = ThemeSwitch;
 export default ThemeSwitch;
