@@ -25,8 +25,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class">
-      <TooltipProvider>
-        <BrowserRouter>
+      <BrowserRouter>
         <div className="min-h-dvh bg-gradient-to-br from-background via-background to-background relative">
           <SiteHeader />
           <main>
@@ -49,7 +48,6 @@ const App = () => (
           <a href="/about" className="fixed bottom-6 right-6 rounded-full px-4 py-3 border border-white/10 bg-white/5 text-cyan-200 hover:bg-white/10 transition-colors shadow-lg">Contact / Chat</a>
         </div>
       </BrowserRouter>
-      </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
