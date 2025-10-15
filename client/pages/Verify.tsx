@@ -30,7 +30,7 @@ const Verify = () => {
 
   const handleChange = useCallback(
     (key: keyof VerifyRequest) =>
-      (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const value = event.target.value;
         setForm((prev) => ({ ...prev, [key]: value }));
       },
