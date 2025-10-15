@@ -1,4 +1,4 @@
-import React from "react";
+import { ChangeEvent, FormEvent, useCallback, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
@@ -8,192 +8,239 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import type { VerifyRequest, VerifyResponse } from "@shared/api";
 
-interface VerifyResponse {
-  label: "fake" | "real" | "ai-generated" | string;
-  confidence: number; // 0..1
-  reason?: string;
-  probabilities?: Record<string, number>;
-}
-
-type State = {
-  text: string;
-  url: string;
-  loading: boolean;
-  result: VerifyResponse | null;
-  error: string | null;
+const initialForm: Pick<VerifyRequest, "text" | "url"> = {
+  text: "",
+  url: "",
 };
 
-export default class Verify extends React.Component<{}, State> {
-  state: State = {
-    text: "",
-    url: "",
-    loading: false,
-    result: null,
-    error: null,
-  };
+const normalizeLabelForDisplay = (label: string) => {
+  const normalized = label.toLowerCase();
+  if (normalized === "fake" || normalized.includes("fake")) {
+    return "AI-generated / Fake";
+  }
+  if (normalized === "real" || normalized.includes("real")) {
+    return "Human / Real";
+  }
+  if (normalized === "ai-generated" || normalized.includes("ai")) {
+    return "AI-generated";
+  }
+  if (normalized === "human" || normalized.includes("human")) {
+    return "Human-authored";
+  }
+  return label
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
 
-  onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    this.setState({ loading: true, error: null, result: null });
-    try {
-      const { text, url } = this.state;
-      const res = await fetch("/api/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, url }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Verification failed");
-      this.setState({ result: data as VerifyResponse });
-    } catch (err: any) {
-      const demo: VerifyResponse = {
-        label: Math.random() > 0.5 ? "ai-generated" : "real",
-        confidence: 0.6 + Math.random() * 0.35,
-        reason:
-          "Demo mode: ML_API_URL not configured. Showing simulated output.",
-        probabilities: {
-          fake: Math.random(),
-          real: Math.random(),
-          "ai-generated": Math.random(),
-        },
+const clampPercent = (value: number) =>
+  Math.round(Math.max(0, Math.min(1, value || 0)) * 100);
+
+const Verify = () => {
+  const [form, setForm] = useState(initialForm);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<VerifyResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const badgeColor = useMemo(() => {
+    if (!result) return "text-green-400";
+    if (result.label === "fake") return "text-red-400";
+    if (result.label === "ai-generated") return "text-purple-400";
+    if (result.label === "real" || result.label === "human")
+      return "text-green-400";
+    return "text-cyan-300";
+  }, [result]);
+
+  const friendlyResultLabel = useMemo(() => {
+    if (!result) return "";
+    return normalizeLabelForDisplay(result.label);
+  }, [result]);
+
+  const probabilityEntries = useMemo(() => {
+    if (!result?.probabilities)
+      return [] as Array<{ key: string; label: string; value: number }>;
+    return Object.entries(result.probabilities)
+      .map(([key, value]) => ({
+        key,
+        label: normalizeLabelForDisplay(key),
+        value: value || 0,
+      }))
+      .sort((a, b) => b.value - a.value);
+  }, [result]);
+
+  const handleChange = useCallback(
+    (key: keyof VerifyRequest) =>
+      (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const value = event.target.value;
+        setForm((prev) => ({ ...prev, [key]: value }));
+      },
+    [],
+  );
+
+  const onSubmit = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setLoading(true);
+      setError(null);
+      setResult(null);
+
+      const payload: VerifyRequest = {
+        text: form.text?.trim() || undefined,
+        url: form.url?.trim() || undefined,
       };
-      this.setState({ result: demo, error: null });
-    } finally {
-      this.setState({ loading: false });
-    }
-  };
 
-  render() {
-    const { text, url, loading, result, error } = this.state;
-    const badgeColor =
-      result?.label === "fake"
-        ? "text-red-400"
-        : result?.label === "ai-generated"
-          ? "text-purple-400"
-          : "text-green-400";
+      try {
+        const response = await fetch("/api/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-    return (
-      <div className="relative py-14">
-        <div className="container grid gap-8 md:grid-cols-2 items-start">
-          <form
-            onSubmit={this.onSubmit}
-            className="glass neon-border rounded-2xl p-6 space-y-4"
-          >
-            <h2 className="font-heading text-2xl text-cyan-300 flex items-center gap-2">
-              <ScanEye className="text-cyan-400" /> Content Verification
-            </h2>
-            <div>
-              <label className="text-sm text-foreground/70 flex items-center gap-2">
-                <LinkIcon className="size-4" /> News URL (optional)
-              </label>
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => this.setState({ url: e.target.value })}
-                placeholder="https://example.com/article"
-                className="mt-1 w-full rounded-md bg-white/5 border border-white/10 p-2 outline-none focus:ring-2 focus:ring-cyan-400"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-foreground/70 flex items-center gap-2">
-                <Upload className="size-4" /> Paste Text
-              </label>
-              <textarea
-                value={text}
-                onChange={(e) => this.setState({ text: e.target.value })}
-                rows={8}
-                placeholder="Paste article or social post content here"
-                className="mt-1 w-full rounded-md bg-white/5 border border-white/10 p-3 outline-none focus:ring-2 focus:ring-cyan-400"
-              />
-            </div>
-            <button
-              disabled={loading || (!text && !url)}
-              className="w-full rounded-md px-4 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold hover:from-cyan-400 hover:to-purple-500 transition-colors"
-            >
-              {loading ? "Analyzing…" : "Verify Now"}
-            </button>
-            <p className="text-xs text-foreground/60">
-              We route your request to our ML service (Hugging Face models) via
-              a secure backend.
-            </p>
-          </form>
-          <div className="min-h-[320px]">
-            <AnimatePresence mode="wait">
-              {loading && (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="glass neon-border rounded-2xl p-6 flex flex-col items-center justify-center gap-4"
-                >
-                  <div className="relative">
-                    <div className="size-28 rounded-full border-2 border-cyan-400/40 animate-pulse" />
-                    <div className="absolute inset-2 rounded-full border-2 border-purple-500/40 animate-[spin_2s_linear_infinite]" />
-                    <div className="absolute inset-6 rounded-full border-2 border-cyan-400/30 animate-[spin_3s_linear_infinite]" />
-                  </div>
-                  <p className="text-foreground/70">Scanning content…</p>
-                </motion.div>
-              )}
-              {error && (
-                <motion.div
-                  key="error"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="glass neon-border rounded-2xl p-6 text-red-300"
-                >
-                  <div className="flex items-center gap-2">
-                    <TriangleAlert /> {error}
-                  </div>
-                </motion.div>
-              )}
-              {result && (
-                <motion.div
-                  key="result"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="glass neon-border rounded-2xl p-6 space-y-4"
-                >
-                  <div
-                    className={`font-heading text-2xl ${badgeColor} flex items-center gap-2`}
-                  >
-                    <ShieldCheck /> {result.label.toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="text-sm text-foreground/70">Confidence</div>
-                    <Progress
-                      value={Math.round((result.confidence || 0) * 100)}
-                      className="h-3"
-                    />
-                  </div>
-                  {result.probabilities && (
-                    <div className="space-y-2">
-                      {Object.entries(result.probabilities).map(([k, v]) => (
-                        <div key={k}>
-                          <div className="text-xs text-foreground/60">{k}</div>
-                          <Progress
-                            value={Math.round((v || 0) * 100)}
-                            className="h-2"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {result.reason && (
-                    <p className="text-sm text-foreground/80">
-                      <span className="text-foreground/60">Reason:</span>{" "}
-                      {result.reason}
-                    </p>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+        const data = (await response.json()) as VerifyResponse & {
+          message?: string;
+        };
+
+        if (!response.ok) {
+          throw new Error(data?.message || "Verification failed");
+        }
+
+        setResult(data);
+      } catch (submissionError) {
+        const message =
+          submissionError instanceof Error
+            ? submissionError.message
+            : "Verification failed";
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [form.text, form.url],
+  );
+
+  return (
+    <div className="relative py-14">
+      <div className="container grid gap-8 md:grid-cols-2 items-start">
+        <form
+          onSubmit={onSubmit}
+          className="glass neon-border rounded-2xl p-6 space-y-4"
+        >
+          <h2 className="font-heading text-2xl text-cyan-300 flex items-center gap-2">
+            <ScanEye className="text-cyan-400" /> Content Verification
+          </h2>
+          <div>
+            <label className="text-sm text-foreground/70 flex items-center gap-2">
+              <LinkIcon className="size-4" /> News URL (optional)
+            </label>
+            <input
+              type="url"
+              value={form.url}
+              onChange={handleChange("url")}
+              placeholder="https://example.com/article"
+              className="mt-1 w-full rounded-md bg-white/5 border border-white/10 p-2 outline-none focus:ring-2 focus:ring-cyan-400"
+            />
           </div>
+          <div>
+            <label className="text-sm text-foreground/70 flex items-center gap-2">
+              <Upload className="size-4" /> Paste Text
+            </label>
+            <textarea
+              value={form.text}
+              onChange={handleChange("text")}
+              rows={8}
+              placeholder="Paste article or social post content here"
+              className="mt-1 w-full rounded-md bg-white/5 border border-white/10 p-3 outline-none focus:ring-2 focus:ring-cyan-400"
+            />
+          </div>
+          <button
+            disabled={loading || (!form.text?.trim() && !form.url?.trim())}
+            className="w-full rounded-md px-4 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold hover:from-cyan-400 hover:to-purple-500 transition-colors disabled:opacity-60"
+          >
+            {loading ? "Analyzing…" : "Verify Now"}
+          </button>
+          <p className="text-xs text-foreground/60">
+            We route your request to our ML service (Hugging Face models) via a
+            secure backend.
+          </p>
+        </form>
+        <div className="min-h-[320px]">
+          <AnimatePresence mode="wait">
+            {loading && (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="glass neon-border rounded-2xl p-6 flex flex-col items-center justify-center gap-4"
+              >
+                <div className="relative">
+                  <div className="size-28 rounded-full border-2 border-cyan-400/40 animate-pulse" />
+                  <div className="absolute inset-2 rounded-full border-2 border-purple-500/40 animate-[spin_2s_linear_infinite]" />
+                  <div className="absolute inset-6 rounded-full border-2 border-cyan-400/30 animate-[spin_3s_linear_infinite]" />
+                </div>
+                <p className="text-foreground/70">Scanning content…</p>
+              </motion.div>
+            )}
+            {!loading && error && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="glass neon-border rounded-2xl p-6 text-red-300"
+              >
+                <div className="flex items-center gap-2">
+                  <TriangleAlert /> {error}
+                </div>
+              </motion.div>
+            )}
+            {!loading && result && (
+              <motion.div
+                key="result"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="glass neon-border rounded-2xl p-6 space-y-4"
+              >
+                <div
+                  className={`font-heading text-2xl ${badgeColor} flex items-center gap-2`}
+                >
+                  <ShieldCheck />{" "}
+                  {friendlyResultLabel || result.label.toUpperCase()}
+                </div>
+                <div>
+                  <div className="text-sm text-foreground/70">Confidence</div>
+                  <Progress
+                    value={clampPercent(result.confidence)}
+                    className="h-3"
+                  />
+                </div>
+                {probabilityEntries.length > 0 && (
+                  <div className="space-y-2">
+                    {probabilityEntries.map(({ key, label, value }) => (
+                      <div key={key}>
+                        <div className="text-xs text-foreground/60">
+                          {label}
+                        </div>
+                        <Progress value={clampPercent(value)} className="h-2" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {result.reason && (
+                  <p className="text-sm text-foreground/80">
+                    <span className="text-foreground/60">Reason:</span>{" "}
+                    {result.reason}
+                  </p>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+export default Verify;

@@ -10,12 +10,10 @@ export default async function handler(req: any, res: any) {
   try {
     const token = process.env.HF_TOKEN;
     if (!token) {
-      res
-        .status(501)
-        .json({
-          message:
-            "HF_TOKEN not configured. Set HF_TOKEN in your Vercel project settings.",
-        });
+      res.status(501).json({
+        message:
+          "HF_TOKEN not configured. Set HF_TOKEN in your Vercel project settings.",
+      });
       return;
     }
 
@@ -63,6 +61,23 @@ export default async function handler(req: any, res: any) {
       return;
     }
 
+    const normalizeLabel = (value: string) => {
+      const normalized = value.toLowerCase();
+      if (normalized === "label_0" || normalized.includes("fake")) {
+        return "fake";
+      }
+      if (normalized === "label_1" || normalized.includes("real")) {
+        return "real";
+      }
+      if (normalized.includes("ai")) {
+        return "ai-generated";
+      }
+      if (normalized.includes("human")) {
+        return "human";
+      }
+      return normalized || "unknown";
+    };
+
     let topLabel = "unknown";
     let topScore = 0;
     const probabilities: Record<string, number> = {};
@@ -73,7 +88,13 @@ export default async function handler(req: any, res: any) {
     if (Array.isArray(items)) {
       for (const it of items) {
         if (it && typeof it === "object") {
-          const label = (it.label || it.class || it.category || "").toString();
+          const rawLabel = (
+            it.label ||
+            it.class ||
+            it.category ||
+            ""
+          ).toString();
+          const label = normalizeLabel(rawLabel);
           const score =
             typeof it.score === "number"
               ? it.score
@@ -81,7 +102,9 @@ export default async function handler(req: any, res: any) {
                 ? it.confidence
                 : 0;
           if (label) {
-            probabilities[label] = score;
+            const current = probabilities[label];
+            probabilities[label] =
+              current !== undefined ? Math.max(current, score) : score;
             if (score > topScore) {
               topLabel = label;
               topScore = score;
@@ -92,7 +115,7 @@ export default async function handler(req: any, res: any) {
     }
 
     const resp: VerifyResponse = {
-      label: topLabel.toLowerCase().includes("fake") ? "fake" : topLabel,
+      label: normalizeLabel(topLabel),
       confidence: topScore || 0,
       probabilities: Object.keys(probabilities).length
         ? probabilities

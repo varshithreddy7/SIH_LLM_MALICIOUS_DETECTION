@@ -30,12 +30,9 @@ export function createServer() {
     try {
       const token = process.env.HF_TOKEN;
       if (!token) {
-        return res
-          .status(501)
-          .json({
-            message:
-              "HF_TOKEN not configured. Set HF_TOKEN in your environment.",
-          });
+        return res.status(501).json({
+          message: "HF_TOKEN not configured. Set HF_TOKEN in your environment.",
+        });
       }
       const payload = req.body as VerifyRequest;
 
@@ -80,6 +77,23 @@ export function createServer() {
         return res.status(hfRes.status).json({ message: msg });
       }
 
+      const normalizeLabel = (value: string) => {
+        const normalized = value.toLowerCase();
+        if (normalized === "label_0" || normalized.includes("fake")) {
+          return "fake";
+        }
+        if (normalized === "label_1" || normalized.includes("real")) {
+          return "real";
+        }
+        if (normalized.includes("ai")) {
+          return "ai-generated";
+        }
+        if (normalized.includes("human")) {
+          return "human";
+        }
+        return normalized || "unknown";
+      };
+
       let topLabel = "unknown";
       let topScore = 0;
       const probabilities: Record<string, number> = {};
@@ -90,12 +104,13 @@ export function createServer() {
       if (Array.isArray(items)) {
         for (const it of items) {
           if (it && typeof it === "object") {
-            const label = (
+            const rawLabel = (
               it.label ||
               it.class ||
               it.category ||
               ""
             ).toString();
+            const label = normalizeLabel(rawLabel);
             const score =
               typeof it.score === "number"
                 ? it.score
@@ -103,7 +118,9 @@ export function createServer() {
                   ? it.confidence
                   : 0;
             if (label) {
-              probabilities[label] = score;
+              const current = probabilities[label];
+              probabilities[label] =
+                current !== undefined ? Math.max(current, score) : score;
               if (score > topScore) {
                 topLabel = label;
                 topScore = score;
@@ -114,7 +131,7 @@ export function createServer() {
       }
 
       const resp: VerifyResponse = {
-        label: topLabel.toLowerCase().includes("fake") ? "fake" : topLabel,
+        label: normalizeLabel(topLabel),
         confidence: topScore || 0,
         probabilities: Object.keys(probabilities).length
           ? probabilities
@@ -132,12 +149,10 @@ export function createServer() {
   // Analytics & reports (MongoDB-backed expected)
   app.get("/api/analytics", async (_req, res) => {
     if (!process.env.MONGODB_URI) {
-      return res
-        .status(501)
-        .json({
-          message:
-            "Analytics not available. Connect MongoDB and implement aggregations.",
-        });
+      return res.status(501).json({
+        message:
+          "Analytics not available. Connect MongoDB and implement aggregations.",
+      });
     }
     try {
       // Intentionally not implemented here to avoid bundling DB drivers.
@@ -153,12 +168,10 @@ export function createServer() {
 
   app.get("/api/reports", async (_req, res) => {
     if (!process.env.MONGODB_URI) {
-      return res
-        .status(501)
-        .json({
-          message:
-            "Reports not available. Connect MongoDB and implement queries.",
-        });
+      return res.status(501).json({
+        message:
+          "Reports not available. Connect MongoDB and implement queries.",
+      });
     }
     try {
       const resp: ReportsResponse = { recent: [] };
