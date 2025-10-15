@@ -8,16 +8,17 @@
       name="description"
       content="AI Defense Intelligence – Detecting & Mitigating Malicious LLM-Generated Disinformation. Verify content, visualize threats, and audit integrity with a futuristic cyber-defense platform."
     />
-    <link rel="icon" href="/placeholder.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/SIH_LLM_MALICIOUS_DETECTION/placeholder.svg" />
+    <link
+      rel="manifest"
+      href="/SIH_LLM_MALICIOUS_DETECTION/manifest.webmanifest"
+    />
     <title>AI Defense Intelligence</title>
     <script>
       (function () {
         try {
           const stored = localStorage.getItem("theme");
-          const prefersDark = window.matchMedia(
-            "(prefers-color-scheme: dark)",
-          ).matches;
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
           const isDark = stored ? stored === "dark" : prefersDark;
           document.documentElement.classList.toggle("dark", isDark);
         } catch (e) {}
@@ -29,7 +30,6 @@
     <div id="root"></div>
 
     <script>
-      // Ensure no stale service workers/cache cause duplicate module copies in dev
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
           .getRegistrations()
@@ -39,13 +39,14 @@
           caches
             .keys()
             .then((keys) =>
-              keys.forEach((k) => /^adi-cache-/.test(k) && caches.delete(k)),
+              keys.forEach((k) => /^adi-cache-/.test(k) && caches.delete(k))
             )
             .catch(() => {});
         }
       }
     </script>
-    <script type="module" src="/client/App.tsx"></script>
-    <!-- Service worker registration disabled in dev to avoid caching dev modules. Enable for production only. -->
+
+    <!-- ✅ Correct Vite entry -->
+    <script type="module" src="/SIH_LLM_MALICIOUS_DETECTION/src/main.tsx"></script>
   </body>
 </html>
