@@ -201,24 +201,18 @@ const Verify = () => {
                 className="glass neon-border rounded-2xl p-6 space-y-4"
               >
                 <div className={`font-heading text-2xl ${badgeColor} flex items-center gap-2`}>
-                  <ShieldCheck /> {result.label.toUpperCase()}
+                  <ShieldCheck /> {friendlyResultLabel || result.label.toUpperCase()}
                 </div>
                 <div>
                   <div className="text-sm text-foreground/70">Confidence</div>
-                  <Progress
-                    value={Math.round((result.confidence || 0) * 100)}
-                    className="h-3"
-                  />
+                  <Progress value={clampPercent(result.confidence)} className="h-3" />
                 </div>
-                {result.probabilities && (
+                {probabilityEntries.length > 0 && (
                   <div className="space-y-2">
-                    {Object.entries(result.probabilities).map(([key, value]) => (
+                    {probabilityEntries.map(({ key, label, value }) => (
                       <div key={key}>
-                        <div className="text-xs text-foreground/60">{key}</div>
-                        <Progress
-                          value={Math.round((value || 0) * 100)}
-                          className="h-2"
-                        />
+                        <div className="text-xs text-foreground/60">{label}</div>
+                        <Progress value={clampPercent(value)} className="h-2" />
                       </div>
                     ))}
                   </div>
