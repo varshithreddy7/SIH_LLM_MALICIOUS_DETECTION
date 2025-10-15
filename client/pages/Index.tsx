@@ -1,7 +1,7 @@
 // Use plain anchors to avoid router context errors at runtime
 import { motion } from 'framer-motion';
 import React, { Suspense } from 'react';
-const Globe = React.lazy(() => import('@/components/effects/Globe').then(m => ({ default: m.Globe })));
+const Globe = React.lazy(() => import('@/components/effects/Globe'));
 import { Shield, ScanEye, Network, ArrowRight } from 'lucide-react';
 
 export default class Index extends React.Component<{}, { deferredPrompt: any }>{
