@@ -1,5 +1,6 @@
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Shield, Radar, Network } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const nav = [
   { to: "/verify", label: "Verify" },
