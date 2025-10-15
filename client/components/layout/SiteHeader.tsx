@@ -1,4 +1,3 @@
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Shield, Radar, Network } from "lucide-react";
 import ThemeSwitch from "@/components/ThemeToggle";
 
