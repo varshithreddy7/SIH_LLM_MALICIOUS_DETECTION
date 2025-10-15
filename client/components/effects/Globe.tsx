@@ -1,6 +1,6 @@
 import React from 'react';
 
-import React from 'react';
+
 
 // Lightweight, hook-free canvas globe to avoid React hook conflicts
 class Globe extends React.Component {
