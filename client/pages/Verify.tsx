@@ -45,7 +45,24 @@ const Verify = () => {
     if (!result) return "text-green-400";
     if (result.label === "fake") return "text-red-400";
     if (result.label === "ai-generated") return "text-purple-400";
-    return "text-green-400";
+    if (result.label === "real" || result.label === "human") return "text-green-400";
+    return "text-cyan-300";
+  }, [result]);
+
+  const friendlyResultLabel = useMemo(() => {
+    if (!result) return "";
+    return normalizeLabelForDisplay(result.label);
+  }, [result]);
+
+  const probabilityEntries = useMemo(() => {
+    if (!result?.probabilities) return [] as Array<{ key: string; label: string; value: number }>;
+    return Object.entries(result.probabilities)
+      .map(([key, value]) => ({
+        key,
+        label: normalizeLabelForDisplay(key),
+        value: value || 0,
+      }))
+      .sort((a, b) => b.value - a.value);
   }, [result]);
 
   const handleChange = useCallback(
