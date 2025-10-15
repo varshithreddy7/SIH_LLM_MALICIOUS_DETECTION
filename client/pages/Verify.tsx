@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useCallback, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
